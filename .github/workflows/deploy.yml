@@ -2,49 +2,47 @@ name: Deploy to EC2
 
 on:
   push:
-    branches:
-      - main  # or your deployment branch
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Build Next.js app
-        run: |
-          npm install
-          npm run build
-
-      - name: Deploy via SSH
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          source: |
-            .next/
-            public/
-            package.json
-            package-lock.json
-            ecosystem.config.js
-            next.config.js
-          target: "/home/ubuntu/ec2-test"
-
-      - name: Run app on EC2
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script: |
-            cd /home/ubuntu/ec2-test
-            npm install
-            npm run start
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build application
+      run: npm run build
+      
+    - name: Deploy to EC2
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        source: ".next/,public/,package.json,next.config.mjs"
+        target: "/home/ubuntu/ec2-test"
+        strip_components: 0
+        
+    - name: Start application on EC2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        script: |
+          cd /home/ubuntu/ec2-test
+          npm install --production
+          # Start the Next.js application
+          nohup npm start > app.log 2>&1 &
