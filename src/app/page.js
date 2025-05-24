@@ -1,10 +1,30 @@
 "use client";
 import { useEffect, useState } from "react";
+import Confetti from "react-confetti";
 
 export default function Home() {
   const [confetti, setConfetti] = useState([]);
+  const [windowSize, setWindowSize] = useState({
+    width: undefined,
+    height: undefined,
+  });
+  const [showConfetti, setShowConfetti] = useState(true);
 
   useEffect(() => {
+    // Handle window size for confetti
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+    
+    // Set initial size
+    handleResize();
+    
+    // Add event listener
+    window.addEventListener("resize", handleResize);
+    
     // Create confetti particles
     const particles = [];
     for (let i = 0; i < 50; i++) {
@@ -17,11 +37,34 @@ export default function Home() {
       });
     }
     setConfetti(particles);
+    
+    // Hide confetti after 5 seconds
+    const timer = setTimeout(() => {
+      setShowConfetti(false);
+    }, 5000);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(timer);
+    };
   }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center relative overflow-hidden">
-      {/* Confetti */}
+      {/* React Confetti */}
+      {showConfetti && (
+        <Confetti
+          width={windowSize.width}
+          height={windowSize.height}
+          recycle={false}
+          numberOfPieces={500}
+          gravity={0.2}
+          colors={['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd', '#FFD700', '#FF1493']}
+        />
+      )}
+      
+      {/* Your existing confetti particles */}
       {confetti.map((particle) => (
         <div
           key={particle.id}
