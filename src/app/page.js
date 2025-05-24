@@ -87,7 +87,7 @@ export default function Home() {
             🎉 Happy Birthday ji! 🎉
           </h1>
           <h2 className="text-4xl font-semibold text-yellow-200 mb-6">
-            harkirat singh
+           ma wajeed
           </h2>
         </div>
 
