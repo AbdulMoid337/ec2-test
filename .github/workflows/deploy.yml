@@ -39,6 +39,6 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            cd /home/ubuntu/
+            cd /home/ubuntu/app
             npm install
             npm run start
