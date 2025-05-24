@@ -3,7 +3,7 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main
+      - main  # or your deployment branch
 
 jobs:
   deploy:
@@ -23,7 +23,7 @@ jobs:
           npm install
           npm run build
 
-      - name: Deploy via SCP
+      - name: Deploy via SSH
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -36,16 +36,7 @@ jobs:
             package-lock.json
             ecosystem.config.js
             next.config.js
-          target: /home/ubuntu/app
-
-      - name: Check deployed files
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script: |
-            ls -l /home/ubuntu/app
+          target: "/home/ubuntu/ec2-test"
 
       - name: Run app on EC2
         uses: appleboy/ssh-action@master
@@ -54,6 +45,6 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            cd /home/ubuntu/app
+            cd /home/ubuntu/ec2-test
             npm install
             npm run start
