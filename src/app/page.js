@@ -41,7 +41,7 @@ export default function Home() {
       <div className="text-center z-10 bg-white bg-opacity-20 backdrop-blur-lg rounded-3xl p-12 shadow-2xl">
         <div className="mb-8">
           <h1 className="text-6xl font-bold text-white mb-4 animate-pulse">
-            🎉 Happy Birthday! 🎉
+            🎉 Happy Birthday ji! 🎉
           </h1>
           <h2 className="text-4xl font-semibold text-yellow-200 mb-6">
             Abdul Moid
